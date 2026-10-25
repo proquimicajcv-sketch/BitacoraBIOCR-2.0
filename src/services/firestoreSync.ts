@@ -99,6 +99,29 @@ export function subscribeToSpecimens(
 }
 
 /**
+ * Fetch all specimens directly from cloud database
+ */
+export async function fetchSpecimensFromCloud(): Promise<SpecimenRecord[]> {
+  try {
+    const snapshot = await getDocs(collection(db, 'specimens'));
+    const list: SpecimenRecord[] = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (data && data.scientificName) {
+        list.push({
+          ...(data as SpecimenRecord),
+          id: docSnap.id,
+        });
+      }
+    });
+    return list;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, 'specimens');
+    throw error;
+  }
+}
+
+/**
  * Save or update single specimen in cloud database
  */
 export async function saveSpecimenToCloud(specimen: SpecimenRecord): Promise<void> {

@@ -22,6 +22,7 @@ import {
   deleteSpecimenFromCloud,
   batchSyncSpecimensToCloud,
   replaceFullSpecimensListInCloud,
+  fetchSpecimensFromCloud,
   testFirestoreConnection,
 } from './services/firestoreSync';
 
@@ -640,25 +641,68 @@ export default function App() {
   const handleSyncServer = async () => {
     setIsSyncingServer(true);
     try {
-      // 1. Push all specimens to Google Cloud Firestore in real-time
-      await batchSyncSpecimensToCloud(specimens);
-      setCloudSyncStatus('connected');
-      setLastCloudSyncTime(new Date().toLocaleTimeString('es-CR'));
+      // 1. Fetch latest documents directly from Google Cloud Firestore
+      let cloudList: SpecimenRecord[] = [];
+      try {
+        cloudList = await fetchSpecimensFromCloud();
+      } catch (cloudErr) {
+        console.warn('Direct cloud fetch warning:', cloudErr);
+      }
 
-      // 2. Also sync to backend file backup
-      const res = await fetch('/api/database/specimens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ specimens, deviceId, lastModified: Date.now() }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSyncStatusToast('¡Sincronizado en tiempo real! Todos tus dispositivos (iPad, Celular y Laptop) están enlazados.');
+      if (cloudList && cloudList.length > 0) {
+        const sanitizedCloud = sanitizeSpecimens(cloudList);
+        setSpecimens(sanitizedCloud);
+        if (sanitizedCloud.length > 0) {
+          setCurrentSpecimen(sanitizedCloud[0]);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizedCloud));
+        localStorage.setItem(TIMESTAMP_KEY, String(Date.now()));
+        localStorage.removeItem(CHANGED_KEY);
+        setCloudSyncStatus('connected');
+        setLastCloudSyncTime(new Date().toLocaleTimeString('es-CR'));
+
+        // Mirror to server container backup as well
+        fetch('/api/database/specimens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ specimens: sanitizedCloud, deviceId, lastModified: Date.now(), replace: true }),
+        }).catch(() => {});
+
+        cacheAllSpecimensMedia(sanitizedCloud).catch(() => {});
+
+        setSyncStatusToast(`¡Actualizado con la nube! Se cargaron ${sanitizedCloud.length} especie(s) y todos sus avistamientos.`);
       } else {
-        setSyncStatusToast('Sincronizado con la nube de Google Cloud.');
+        // Cloud is empty, push current sanitized local data to initialize cloud
+        const sanitized = sanitizeSpecimens(specimens);
+        await batchSyncSpecimensToCloud(sanitized);
+        setCloudSyncStatus('connected');
+        setLastCloudSyncTime(new Date().toLocaleTimeString('es-CR'));
+
+        // Also sync to server container
+        await fetch('/api/database/specimens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ specimens: sanitized, deviceId, lastModified: Date.now() }),
+        });
+
+        setSyncStatusToast('¡Sincronizado! Tu bitácora local fue enviada a la nube de Google Cloud.');
       }
     } catch {
-      setSyncStatusToast('Modo offline: tus datos siguen protegidos en este equipo y se sincronizarán al recuperar señal.');
+      // Fallback: try container server sync
+      try {
+        const res = await fetch('/api/database/specimens');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const sanitized = sanitizeSpecimens(data.data);
+          setSpecimens(sanitized);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+          setSyncStatusToast(`Sincronizado desde el servidor central (${sanitized.length} registros).`);
+        } else {
+          setSyncStatusToast('Modo offline: tus datos siguen protegidos en este equipo.');
+        }
+      } catch {
+        setSyncStatusToast('Modo offline: tus datos siguen protegidos en este equipo.');
+      }
     } finally {
       setIsSyncingServer(false);
       setTimeout(() => setSyncStatusToast(null), 4000);
