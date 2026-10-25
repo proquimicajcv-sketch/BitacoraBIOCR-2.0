@@ -27,7 +27,7 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
   if (!isOpen) return null;
 
   const [importStatus, setImportStatus] = useState<string | null>(null);
-  const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
+  const [importMode, setImportMode] = useState<'merge' | 'replace'>('replace');
   const [showJsonTextarea, setShowJsonTextarea] = useState(false);
   const [pastedJson, setPastedJson] = useState('');
   const [copiedToast, setCopiedToast] = useState(false);
@@ -273,8 +273,8 @@ export const SyncBackupModal: React.FC<SyncBackupModalProps> = ({
                   onChange={(e) => setImportMode(e.target.value as any)}
                   className="px-2 py-1 rounded bg-[#f2f4ee] border border-[#c1c8c3] text-[11px] font-medium text-[#191c19]"
                 >
+                  <option value="replace">Reemplazar todo (Fiel al archivo)</option>
                   <option value="merge">Fusionar (sumar registros)</option>
-                  <option value="replace">Reemplazar todo</option>
                 </select>
               </div>
 

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mistBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#051c14"/>
+      <stop offset="40%" stop-color="#0d3326"/>
+      <stop offset="80%" stop-color="#144635"/>
+      <stop offset="100%" stop-color="#08241b"/>
+    </linearGradient>
+    <radialGradient id="mistCloud" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#a5d0bc" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#144635" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#051c14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="quetzalGreen" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="30%" stop-color="#059669"/>
+      <stop offset="70%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="quetzalChest" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="35%" stop-color="#ef4444"/>
+      <stop offset="80%" stop-color="#b91c1c"/>
+      <stop offset="100%" stop-color="#7f1d1d"/>
+    </linearGradient>
+    <linearGradient id="quetzalBeak" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="quetzalGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- Cloud Forest Misty Background -->
+  <rect width="800" height="600" fill="url(#mistBg)"/>
+  <rect width="800" height="600" fill="url(#mistCloud)"/>
+
+  <!-- Epiphyte Covered Oak Branch (Talamanca Robledal) -->
+  <g filter="url(#quetzalGlow)">
+    <path d="M 50 380 Q 300 420 500 400 T 800 440 L 800 500 Q 500 460 300 470 T 50 430 Z" fill="#2d2217"/>
+    <!-- Moss on branch -->
+    <path d="M 60 385 Q 280 415 480 398 T 790 435" stroke="#16a34a" stroke-width="12" stroke-linecap="round" fill="none" opacity="0.75"/>
+    <path d="M 150 395 Q 350 420 550 405" stroke="#4ade80" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+  </g>
+
+  <!-- Pharomachrus mocinno (Resplendent Quetzal Male) -->
+  <g filter="url(#quetzalGlow)" transform="translate(180, 20)">
+    <!-- Long Trailing Tail Covert Streamers (Guías Caudales) -->
+    <path d="M 180 360 C 160 440 210 520 190 570 C 175 610 130 550 140 480 C 150 420 165 370 170 360 Z" fill="url(#quetzalGreen)"/>
+    <path d="M 195 365 C 225 430 185 500 230 560 C 240 575 220 580 205 540 C 185 490 210 430 190 365 Z" fill="url(#quetzalGreen)"/>
+
+    <!-- Tail Core Feathers -->
+    <path d="M 170 340 L 195 440 L 160 440 Z" fill="#064e3b"/>
+    <path d="M 175 350 L 180 430 L 190 430 Z" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Robust Body & Scarlet Breast -->
+    <ellipse cx="190" cy="270" rx="55" ry="75" fill="url(#quetzalChest)"/>
+    
+    <!-- Iridescent Emerald Green Wing & Back -->
+    <path d="M 140 220 C 120 270 140 340 180 365 C 190 340 185 260 170 230 Z" fill="url(#quetzalGreen)"/>
+    <!-- Wing Covert Feathers Plumes -->
+    <path d="M 155 240 Q 135 290 165 330" stroke="#34d399" stroke-width="3" fill="none" opacity="0.8"/>
+    <path d="M 165 250 Q 150 300 175 340" stroke="#34d399" stroke-width="3" fill="none" opacity="0.8"/>
+
+    <!-- Crested Head & Crown -->
+    <path d="M 160 160 C 145 130 190 120 215 140 C 235 155 235 185 220 205 C 190 220 165 200 160 160 Z" fill="url(#quetzalGreen)"/>
+    <!-- Fluffy Filamentous Crest -->
+    <path d="M 170 135 Q 185 115 200 130 Q 215 115 220 140" stroke="#34d399" stroke-width="4" fill="none"/>
+
+    <!-- Sharp Eye -->
+    <circle cx="205" cy="165" r="9" fill="#000000"/>
+    <circle cx="203" cy="163" r="3" fill="#ffffff"/>
+
+    <!-- Golden Yellow Bill (Pico) -->
+    <polygon points="225,168 255,175 225,182" fill="url(#quetzalBeak)"/>
+
+    <!-- Perching Feet on Branch -->
+    <ellipse cx="170" cy="365" rx="8" ry="5" fill="#f59e0b"/>
+    <ellipse cx="190" cy="367" rx="8" ry="5" fill="#f59e0b"/>
+  </g>
+
+  <!-- Scientific Badge Banner -->
+  <g transform="translate(30, 35)">
+    <rect width="380" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#34d399" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#6cf8bb" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">AVES • TROGONIDAE</text>
+    <text x="20" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" font-style="italic">Pharomachrus mocinno</text>
+  </g>
+  <g transform="translate(530, 35)">
+    <rect width="240" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="18" y="28" fill="#fde68a" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" letter-spacing="1">MONTEVERDE &amp; DOTA (2200m)</text>
+    <text x="18" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700">Quetzal Resplandeciente</text>
+  </g>
+</svg>

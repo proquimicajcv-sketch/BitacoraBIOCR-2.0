@@ -1,6 +1,7 @@
 import { SpecimenRecord } from '../types/specimen';
 
 export const INITIAL_SPECIMENS: SpecimenRecord[] = [
+  // 1. ANFIBIO MICROENDÉMICO: Isthmohyla nacientes (Rana de las Nacientes / Rana Cafetera)
   {
     id: 'cr-bio-2026-0042',
     catalogNumber: 'CAT. CR-BIO-2026-0042',

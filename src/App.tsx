@@ -21,6 +21,7 @@ import {
   saveSpecimenToCloud,
   deleteSpecimenFromCloud,
   batchSyncSpecimensToCloud,
+  replaceFullSpecimensListInCloud,
   testFirestoreConnection,
 } from './services/firestoreSync';
 
@@ -32,6 +33,16 @@ const TIMESTAMP_KEY = 'biobitacora_cr_last_modified';
 const DEVICE_ID_KEY = 'biobitacora_cr_device_id';
 const OBSERVER_NAME_KEY = 'biobitacora_cr_observer_name';
 const DEVICE_NAME_KEY = 'biobitacora_cr_device_name';
+
+// Removed demo species IDs - permanently excluded from catalog
+const UNWANTED_DUMMY_IDS = new Set([
+  'cr-bio-2024-9104', // Oophaga pumilio
+  'cr-bio-2024-7731', // Pharomachrus mocinno
+  'cr-bio-2024-6420', // Morpho peleides
+  'cr-bio-2025-0199', // Tapirus bairdii
+  'cr-bio-2025-0312', // Bothriechis schlegelii
+  'cr-bio-2025-0455', // Guarianthe skinneri
+]);
 
 function getOrCreateDeviceId(): string {
   try {
@@ -48,12 +59,14 @@ function getOrCreateDeviceId(): string {
 }
 
 function mergeSpecimenLists(existingList: SpecimenRecord[], incomingList: SpecimenRecord[]): SpecimenRecord[] {
-  if (!Array.isArray(existingList) || existingList.length === 0) return incomingList;
-  if (!Array.isArray(incomingList) || incomingList.length === 0) return existingList;
+  const cleanExisting = (existingList || []).filter((e) => e && !UNWANTED_DUMMY_IDS.has(e.id));
+  const cleanIncoming = (incomingList || []).filter((e) => e && !UNWANTED_DUMMY_IDS.has(e.id));
+  if (cleanExisting.length === 0) return cleanIncoming;
+  if (cleanIncoming.length === 0) return cleanExisting;
 
-  const result: SpecimenRecord[] = [...existingList];
+  const result: SpecimenRecord[] = [...cleanExisting];
 
-  for (const incoming of incomingList) {
+  for (const incoming of cleanIncoming) {
     const idx = result.findIndex(
       (e) => (incoming.id && e.id === incoming.id) ||
              (incoming.scientificName && e.scientificName === incoming.scientificName)
@@ -165,160 +178,157 @@ function mergeSpecimenLists(existingList: SpecimenRecord[], incomingList: Specim
 }
 
 function sanitizeSpecimens(list: SpecimenRecord[]): SpecimenRecord[] {
-  const demoIdsToPurge = new Set([
-    'cr-bio-2024-9104', // Oophaga pumilio
-    'cr-bio-2024-7731', // Pharomachrus mocinno
-    'cr-bio-2024-6420', // Morpho peleides
-    'cr-bio-2025-0199', // Tapirus bairdii
-    'cr-bio-2025-0312', // Bothriechis schlegelii
-    'cr-bio-2025-0455', // Guarianthe skinneri
-    'cr-bio-2024-8842', // Agalychnis old
-  ]);
+  // Purge unwanted demo species permanently
+  const cleaned = (list || []).filter((item) => item && !UNWANTED_DUMMY_IDS.has(item.id));
 
-  let filtered = (list || [])
-    .filter((item) => !demoIdsToPurge.has(item.id))
-    .map((item) => {
-      if (
-        item.scientificName === 'Isthmohyla nacientes' ||
-        item.id === INITIAL_SPECIMENS[0].id
-      ) {
-        const existingSightings = item.sightings || [];
-        const dotaSightExists = existingSightings.some((s) => s.id === 'sight-dota-20261009');
-        let mergedSightings = dotaSightExists
-          ? existingSightings
-          : [INITIAL_SPECIMENS[0].sightings![0], ...existingSightings];
+  if (cleaned.length === 0) {
+    return INITIAL_SPECIMENS;
+  }
 
-        // Auto-sort chronologically by date descending (most recent visit first)
-        mergedSightings = [...mergedSightings].sort((a, b) => {
-          const dateA = a.date || a.timestamp || '';
-          const dateB = b.date || b.timestamp || '';
-          return dateB.localeCompare(dateA);
-        });
+  let filtered = cleaned.map((item) => {
+    if (
+      item.scientificName === 'Isthmohyla nacientes' ||
+      item.id === INITIAL_SPECIMENS[0].id
+    ) {
+      const existingSightings = item.sightings || [];
+      const dotaSightExists = existingSightings.some((s) => s.id === 'sight-dota-20261009');
+      let mergedSightings = dotaSightExists
+        ? existingSightings
+        : [INITIAL_SPECIMENS[0].sightings![0], ...existingSightings];
 
-        // Find any user-uploaded custom photo for macho tuerto from additionalPhotos or sightings
-        const rawPhotos = (item.additionalPhotos && item.additionalPhotos.length > 0)
-          ? item.additionalPhotos
-          : INITIAL_SPECIMENS[0].additionalPhotos;
+      // Auto-sort chronologically by date descending (most recent visit first)
+      mergedSightings = [...mergedSightings].sort((a, b) => {
+        const dateA = a.date || a.timestamp || '';
+        const dateB = b.date || b.timestamp || '';
+        return dateB.localeCompare(dateA);
+      });
 
-        const existingP4 = (rawPhotos || []).find(
-          (p) => p.id === 'photo-4' || (p.label && p.label.toLowerCase().includes('macho tuerto'))
-        );
-        const p4HasValidPhoto = existingP4?.url && !existingP4.url.includes('isthmohyla_nacientes') && !existingP4.url.includes('eye_zoom');
+      // Find any user-uploaded custom photo for macho tuerto from additionalPhotos or sightings
+      const rawPhotos = (item.additionalPhotos && item.additionalPhotos.length > 0)
+        ? item.additionalPhotos
+        : INITIAL_SPECIMENS[0].additionalPhotos;
 
-        const dotaSightRef = mergedSightings.find((s) => s.id === 'sight-dota-20261009' || s.isCuriousFinding || s.curiousFindingTitle?.includes('Macho'));
-        const sightHasValidPhoto = dotaSightRef?.curiousFindingPhoto && !dotaSightRef.curiousFindingPhoto.includes('isthmohyla_nacientes') && !dotaSightRef.curiousFindingPhoto.includes('eye_zoom');
+      const existingP4 = (rawPhotos || []).find(
+        (p) => p.id === 'photo-4' || (p.label && p.label.toLowerCase().includes('macho tuerto'))
+      );
+      const p4HasValidPhoto = existingP4?.url && !existingP4.url.includes('isthmohyla_nacientes') && !existingP4.url.includes('eye_zoom');
 
-        // Best user custom photo, or permanent default macho tuerto (NEVER takes cover photo)
-        let activeMachoPhoto = '/hallazgo_macho_un_ojo.jpg';
-        const savedCustomMacho = typeof window !== 'undefined' ? localStorage.getItem('bio_macho_tuerto_custom_photo') : null;
+      const dotaSightRef = mergedSightings.find((s) => s.id === 'sight-dota-20261009' || s.isCuriousFinding || s.curiousFindingTitle?.includes('Macho'));
+      const sightHasValidPhoto = dotaSightRef?.curiousFindingPhoto && !dotaSightRef.curiousFindingPhoto.includes('isthmohyla_nacientes') && !dotaSightRef.curiousFindingPhoto.includes('eye_zoom');
 
-        if (p4HasValidPhoto && existingP4?.url) {
-          activeMachoPhoto = existingP4.url;
-        } else if (sightHasValidPhoto && dotaSightRef?.curiousFindingPhoto) {
-          activeMachoPhoto = dotaSightRef.curiousFindingPhoto;
-        } else if (savedCustomMacho && !savedCustomMacho.includes('isthmohyla_nacientes') && !savedCustomMacho.includes('eye_zoom')) {
-          activeMachoPhoto = savedCustomMacho;
-        }
+      // Best user custom photo, or permanent default macho tuerto (NEVER takes cover photo)
+      let activeMachoPhoto = '/hallazgo_macho_un_ojo.jpg';
+      const savedCustomMacho = typeof window !== 'undefined' ? localStorage.getItem('bio_macho_tuerto_custom_photo') : null;
 
-        // Ensure whatever custom photo is active is permanently saved locally and synchronized
-        if (activeMachoPhoto && activeMachoPhoto !== '/hallazgo_macho_un_ojo.jpg') {
-          try {
-            localStorage.setItem('bio_macho_tuerto_custom_photo', activeMachoPhoto);
-          } catch {}
-        }
+      if (p4HasValidPhoto && existingP4?.url) {
+        activeMachoPhoto = existingP4.url;
+      } else if (sightHasValidPhoto && dotaSightRef?.curiousFindingPhoto) {
+        activeMachoPhoto = dotaSightRef.curiousFindingPhoto;
+      } else if (savedCustomMacho && !savedCustomMacho.includes('isthmohyla_nacientes') && !savedCustomMacho.includes('eye_zoom')) {
+        activeMachoPhoto = savedCustomMacho;
+      }
 
-        // 1. Ensure sight-dota-20261009 keeps user custom photo or default macho tuerto
-        mergedSightings = mergedSightings.map((s) => {
-          if (s.id === 'sight-dota-20261009' || s.isCuriousFinding || s.curiousFindingTitle?.includes('Macho')) {
-            return {
-              ...s,
-              curiousFindingPhoto: activeMachoPhoto,
-              photoUrls: activeMachoPhoto ? [activeMachoPhoto] : ['/hallazgo_macho_un_ojo.jpg'],
-            };
-          }
-          return s;
-        });
+      // Ensure whatever custom photo is active is permanently saved locally and synchronized
+      if (activeMachoPhoto && activeMachoPhoto !== '/hallazgo_macho_un_ojo.jpg') {
+        try {
+          localStorage.setItem('bio_macho_tuerto_custom_photo', activeMachoPhoto);
+        } catch {}
+      }
 
-        // 2. Ensure photo-3 (Detalle Ocular) ALWAYS keeps the eye zoom macro
-        let cleanedPhotos = (rawPhotos || []).map((p) => {
-          if (p.id === 'photo-3' || p.label === 'Detalle Ocular') {
-            return {
-              ...p,
-              url: '/isthmohyla_nacientes_eye_zoom.jpg',
-              label: 'Detalle Ocular',
-              description: 'Macro zoom de alta precisión y nitidez del ojo de Isthmohyla nacientes. Se aprecia el iris cobrizo-dorado metálico característico con reticulaciones oscuras dendríticas, pupila horizontal adaptada a baja luminosidad en quebradas y piel verde esmeralda con gránulos cutáneos húmedos.',
-            };
-          }
-          return p;
-        });
-
-        // 3. Ensure photo-4 (Hallazgo: Macho Tuerto) is permanently synchronized and NEVER takes cover photo
-        const p4Idx = cleanedPhotos.findIndex(
-          (p) => p.id === 'photo-4' || p.label.toLowerCase().includes('macho tuerto')
-        );
-        if (p4Idx >= 0) {
-          cleanedPhotos[p4Idx] = {
-            ...cleanedPhotos[p4Idx],
-            id: 'photo-4',
-            url: activeMachoPhoto,
-            label: 'Hallazgo: Macho Tuerto',
-            description: cleanedPhotos[p4Idx].description || 'Hallazgo curioso en Santa María de Dota (Viernes 9): Macho adulto de Isthmohyla nacientes al que le falta un ojo (anoftalmia/cicatrización natural). Era el que cantaba con mayor potencia acústica a 45 cm del caudal.',
+      // 1. Ensure sight-dota-20261009 keeps user custom photo or default macho tuerto
+      mergedSightings = mergedSightings.map((s) => {
+        if (s.id === 'sight-dota-20261009' || s.isCuriousFinding || s.curiousFindingTitle?.includes('Macho')) {
+          return {
+            ...s,
+            curiousFindingPhoto: activeMachoPhoto,
+            photoUrls: activeMachoPhoto ? [activeMachoPhoto] : ['/hallazgo_macho_un_ojo.jpg'],
           };
-        } else {
-          cleanedPhotos.push({
-            id: 'photo-4',
-            url: activeMachoPhoto,
-            label: 'Hallazgo: Macho Tuerto',
-            description: 'Hallazgo curioso en Santa María de Dota (Viernes 9): Macho adulto de Isthmohyla nacientes al que le falta un ojo (anoftalmia/cicatrización natural). Era el que cantaba con mayor potencia acústica a 45 cm del caudal.',
-          });
         }
+        return s;
+      });
 
-        return {
-          ...item,
-          heroImage: '/isthmohyla_nacientes.jpg',
-          additionalPhotos: cleanedPhotos,
-          sightings: mergedSightings,
-          morphometrics: {
-            ...item.morphometrics,
-            courtshipAndMating: INITIAL_SPECIMENS[0].morphometrics.courtshipAndMating,
-          },
+      // 2. Ensure photo-3 (Detalle Ocular) ALWAYS keeps the eye zoom macro
+      let cleanedPhotos = (rawPhotos || []).map((p) => {
+        if (p.id === 'photo-3' || p.label === 'Detalle Ocular') {
+          return {
+            ...p,
+            url: '/isthmohyla_nacientes_eye_zoom.jpg',
+            label: 'Detalle Ocular',
+            description: 'Macro zoom de alta precisión y nitidez del ojo de Isthmohyla nacientes. Se aprecia el iris cobrizo-dorado metálico característico con reticulaciones oscuras dendríticas, pupila horizontal adaptada a baja luminosidad en quebradas y piel verde esmeralda con gránulos cutáneos húmedos.',
+          };
+        }
+        return p;
+      });
+
+      // 3. Ensure photo-4 (Hallazgo: Macho Tuerto) is permanently synchronized and NEVER takes cover photo
+      const p4Idx = cleanedPhotos.findIndex(
+        (p) => p.id === 'photo-4' || p.label.toLowerCase().includes('macho tuerto')
+      );
+      if (p4Idx >= 0) {
+        cleanedPhotos[p4Idx] = {
+          ...cleanedPhotos[p4Idx],
+          id: 'photo-4',
+          url: activeMachoPhoto,
+          label: 'Hallazgo: Macho Tuerto',
+          description: cleanedPhotos[p4Idx].description || 'Hallazgo curioso en Santa María de Dota (Viernes 9): Macho adulto de Isthmohyla nacientes al que le falta un ojo (anoftalmia/cicatrización natural). Era el que cantaba con mayor potencia acústica a 45 cm del caudal.',
         };
+      } else {
+        cleanedPhotos.push({
+          id: 'photo-4',
+          url: activeMachoPhoto,
+          label: 'Hallazgo: Macho Tuerto',
+          description: 'Hallazgo curioso en Santa María de Dota (Viernes 9): Macho adulto de Isthmohyla nacientes al que le falta un ojo (anoftalmia/cicatrización natural). Era el que cantaba con mayor potencia acústica a 45 cm del caudal.',
+        });
       }
 
-      // Toda ficha catalogada representa por sí misma al menos 1 avistamiento inicial de campo.
-      // Si la lista de avistamientos está vacía, aseguramos la entrada del avistamiento inicial.
-      const currentSightings = item.sightings || [];
-      if (currentSightings.length === 0) {
-        const initSighting: SightingEntry = {
-          id: `sight-init-${item.id}`,
-          timestamp: `${item.collectionDate || 'Fecha de registro'} ${item.collectionTime || ''}`.trim(),
-          date: item.collectionDate || new Date().toISOString().slice(0, 10),
-          observer: item.collector || 'Ing. Carvajal V.',
-          locality: item.georeference?.locality || 'Costa Rica',
-          coordinates: item.georeference ? `${item.georeference.latitude}° N, ${item.georeference.longitude}° W` : undefined,
-          count: 1,
-          individualsCount: 1,
-          microhabitat: item.georeference?.microhabitat || 'Microhábitat registrado en campo',
-          weather: 'Condición ambiental de campo',
-          behaviorObserved: 'Individuo observado y catalogado en campo.',
-          notes: 'Avistamiento y registro inicial de la especie en la bitácora.',
-          vitalityStatus: 'VIVO',
-          lifeStage: 'ADULTO',
-        };
-        return {
-          ...item,
-          sightings: [initSighting],
-        };
-      }
+      return {
+        ...item,
+        heroImage: '/isthmohyla_nacientes.jpg',
+        additionalPhotos: cleanedPhotos,
+        sightings: mergedSightings,
+        morphometrics: {
+          ...item.morphometrics,
+          courtshipAndMating: INITIAL_SPECIMENS[0].morphometrics.courtshipAndMating,
+        },
+      };
+    }
 
-      return item;
-    });
+    // Toda ficha catalogada representa por sí misma al menos 1 avistamiento inicial de campo.
+    // Si la lista de avistamientos está vacía, aseguramos la entrada del avistamiento inicial.
+    const currentSightings = item.sightings || [];
+    if (currentSightings.length === 0) {
+      const initSighting: SightingEntry = {
+        id: `sight-init-${item.id}`,
+        timestamp: `${item.collectionDate || 'Fecha de registro'} ${item.collectionTime || ''}`.trim(),
+        date: item.collectionDate || new Date().toISOString().slice(0, 10),
+        observer: item.collector || 'Ing. Carvajal V.',
+        locality: item.georeference?.locality || 'Costa Rica',
+        coordinates: item.georeference ? `${item.georeference.latitude}° N, ${item.georeference.longitude}° W` : undefined,
+        count: 1,
+        individualsCount: 1,
+        microhabitat: item.georeference?.microhabitat || 'Microhábitat registrado en campo',
+        weather: 'Condición ambiental de campo',
+        behaviorObserved: 'Individuo observado y catalogado en campo.',
+        notes: 'Avistamiento y registro inicial de la especie en la bitácora.',
+        vitalityStatus: 'VIVO',
+        lifeStage: 'ADULTO',
+      };
+      return {
+        ...item,
+        sightings: [initSighting],
+      };
+    }
 
-  const hasNacientes = filtered.some(
+    return item;
+  });
+
+  // Garantizar que Isthmohyla nacientes sea el primer espécimen emblema si está presente
+  const nacientesIdx = filtered.findIndex(
     (s) => s.scientificName === 'Isthmohyla nacientes' || s.id === INITIAL_SPECIMENS[0].id
   );
-  if (!hasNacientes) {
-    filtered = [INITIAL_SPECIMENS[0], ...filtered];
+  if (nacientesIdx > 0) {
+    const [nac] = filtered.splice(nacientesIdx, 1);
+    filtered.unshift(nac);
   }
 
   return filtered;
@@ -384,7 +394,7 @@ export default function App() {
   } | undefined>(undefined);
 
   // Centralized robust persistence helper (immediate local + Google Cloud Firestore + server sync)
-  const persistSpecimens = async (updated: SpecimenRecord[]) => {
+  const persistSpecimens = async (updated: SpecimenRecord[], isReplace: boolean = false) => {
     const sanitized = sanitizeSpecimens(updated);
     setSpecimens(sanitized);
     const now = Date.now();
@@ -397,7 +407,11 @@ export default function App() {
     }
 
     // 1. Instantly push to Google Cloud Firestore (all devices sync in milliseconds)
-    batchSyncSpecimensToCloud(sanitized)
+    const cloudPromise = isReplace
+      ? replaceFullSpecimensListInCloud(sanitized)
+      : batchSyncSpecimensToCloud(sanitized);
+
+    cloudPromise
       .then(() => {
         setCloudSyncStatus('connected');
         setLastCloudSyncTime(new Date().toLocaleTimeString('es-CR'));
@@ -415,7 +429,7 @@ export default function App() {
       fetch('/api/database/specimens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ specimens: sanitized, lastModified: now, deviceId }),
+        body: JSON.stringify({ specimens: sanitized, lastModified: now, deviceId, replace: isReplace }),
       }).catch(() => {});
     } catch {}
 
@@ -448,7 +462,7 @@ export default function App() {
         if (cloudSpecimens.length === 0) {
           // If cloud database is newly initialized, seed it with current local/initial specimens
           setSpecimens((current) => {
-            const listToUpload = current && current.length > 0 ? current : INITIAL_SPECIMENS;
+            const listToUpload = current && current.length > 0 ? sanitizeSpecimens(current) : INITIAL_SPECIMENS;
             batchSyncSpecimensToCloud(listToUpload).catch((err) => console.warn('Cloud seed error:', err));
             return listToUpload;
           });
@@ -456,24 +470,24 @@ export default function App() {
         }
 
         setSpecimens((prevLocal) => {
-          // Merge incoming cloud specimens with local specimens
-          const merged = mergeSpecimenLists(prevLocal, cloudSpecimens);
-          const sanitized = sanitizeSpecimens(merged);
+          const hasLocalChanges = localStorage.getItem(CHANGED_KEY) === 'true';
+          const incomingClean = sanitizeSpecimens(cloudSpecimens);
+
+          let finalCleanList: SpecimenRecord[];
+          if (!hasLocalChanges) {
+            // Cloud is authoritative source of truth across all devices
+            finalCleanList = incomingClean;
+          } else {
+            finalCleanList = sanitizeSpecimens(mergeSpecimenLists(prevLocal, incomingClean));
+          }
 
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(finalCleanList));
             localStorage.setItem(TIMESTAMP_KEY, String(Date.now()));
           } catch {}
 
-          // If local had unsynced sightings or species not yet in cloud, push merged back to cloud!
-          const localSightingsCount = prevLocal.reduce((acc, s) => acc + (s.sightings?.length || 0), 0);
-          const cloudSightingsCount = cloudSpecimens.reduce((acc, s) => acc + (s.sightings?.length || 0), 0);
-          if (localSightingsCount > cloudSightingsCount || prevLocal.length > cloudSpecimens.length) {
-            batchSyncSpecimensToCloud(sanitized).catch(() => {});
-          }
-
-          cacheAllSpecimensMedia(sanitized).catch(() => {});
-          return sanitized;
+          cacheAllSpecimensMedia(finalCleanList).catch(() => {});
+          return finalCleanList;
         });
       },
       (status) => {
@@ -493,18 +507,25 @@ export default function App() {
       const data = await res.json();
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         setSpecimens((prevLocal) => {
-          const merged = mergeSpecimenLists(prevLocal, data.data);
-          const sanitized = sanitizeSpecimens(merged);
+          const hasLocalChanges = localStorage.getItem(CHANGED_KEY) === 'true';
+          const serverClean = sanitizeSpecimens(data.data);
+
+          let finalCleanList: SpecimenRecord[];
+          if (!hasLocalChanges) {
+            finalCleanList = serverClean;
+          } else {
+            finalCleanList = sanitizeSpecimens(mergeSpecimenLists(prevLocal, serverClean));
+          }
 
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(finalCleanList));
             if (data.lastModified) {
               localStorage.setItem(TIMESTAMP_KEY, String(data.lastModified));
             }
           } catch {}
 
-          cacheAllSpecimensMedia(sanitized).catch(() => {});
-          return sanitized;
+          cacheAllSpecimensMedia(finalCleanList).catch(() => {});
+          return finalCleanList;
         });
 
         if (!silent) {
@@ -588,13 +609,14 @@ export default function App() {
   const handleImportSpecimens = (imported: SpecimenRecord[], replace: boolean) => {
     let result: SpecimenRecord[];
     if (replace) {
-      result = imported;
+      result = sanitizeSpecimens(imported);
     } else {
+      const sanitizedImported = sanitizeSpecimens(imported);
       const existingIds = new Set(specimens.map((s) => s.id));
-      const uniqueNew = imported.filter((s) => !existingIds.has(s.id));
+      const uniqueNew = sanitizedImported.filter((s) => !existingIds.has(s.id));
       result = [...specimens, ...uniqueNew];
     }
-    persistSpecimens(result);
+    persistSpecimens(result, replace);
     if (result.length > 0) {
       setCurrentSpecimen(result[0]);
     }
@@ -603,7 +625,7 @@ export default function App() {
     fetch('/api/database/import-json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ specimens: result }),
+      body: JSON.stringify({ specimens: result, merge: !replace }),
     })
       .then((res) => res.json())
       .then((data) => {

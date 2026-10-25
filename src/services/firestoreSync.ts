@@ -130,6 +130,46 @@ export async function deleteSpecimenFromCloud(specimenId: string): Promise<void>
 }
 
 /**
+ * Replace entire cloud collection with specified list:
+ * - Upserts all documents in the new list
+ * - Deletes any old documents in Firestore that are not in the new list
+ * Ensures removed or replaced specimens do not resurrect across other devices
+ */
+export async function replaceFullSpecimensListInCloud(specimens: SpecimenRecord[]): Promise<void> {
+  if (!Array.isArray(specimens)) return;
+
+  try {
+    const validIds = new Set(specimens.map((s) => s.id));
+    const snapshot = await getDocs(collection(db, 'specimens'));
+
+    const batch = writeBatch(db);
+
+    // 1. Delete documents from Firestore that are no longer in the list
+    snapshot.forEach((docSnap) => {
+      if (!validIds.has(docSnap.id)) {
+        batch.delete(docSnap.ref);
+      }
+    });
+
+    // 2. Set/update all active documents
+    for (const s of specimens) {
+      if (s && s.id) {
+        const ref = doc(db, 'specimens', s.id);
+        const clean = JSON.parse(JSON.stringify(s));
+        clean.updatedAt = new Date().toISOString();
+        batch.set(ref, clean, { merge: true });
+      }
+    }
+
+    await batch.commit();
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'specimens/replace-all');
+    // Fallback: batch sync without delete
+    await batchSyncSpecimensToCloud(specimens);
+  }
+}
+
+/**
  * Seed or batch upload multiple specimens to cloud
  */
 export async function batchSyncSpecimensToCloud(specimens: SpecimenRecord[]): Promise<void> {
@@ -148,7 +188,6 @@ export async function batchSyncSpecimensToCloud(specimens: SpecimenRecord[]): Pr
     await batch.commit();
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'specimens/batch');
-    // Fallback: save one by one
     for (const s of specimens) {
       try {
         await saveSpecimenToCloud(s);
@@ -156,3 +195,4 @@ export async function batchSyncSpecimensToCloud(specimens: SpecimenRecord[]): Pr
     }
   }
 }
+

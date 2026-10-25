@@ -63,21 +63,9 @@
       "interspecificRelations": "Congénere de las ranas de montaña de Talamanca Isthmohyla rivularis e Isthmohyla tica, con las cuales fue confundida en colectas históricas de la década de 1960 hasta que análisis moleculares y bioacústicos en 2026 demostraron su independencia evolutiva. Comparte microhábitat ribereño con ranitas de hojarasca Craugastor podiciferus y Pristimantis cruentus. Es una especie bioindicadora clave de la pureza de las fuentes hídricas de la región.",
       "confirmedScientificData": "Descrita formalmente a inicios de 2026 en la revista científica Ichthyology & Herpetology por los investigadores Wagner Chaves-Acuña, Juan Abarca, Jonathan Navarro-Picado, Esteban Hidalgo-Mora, Marilyn Ureña-Chaves, Alejandro Valverde-Castillo, Gerardo Chaves, Federico Bolaños y Julián Faivovich. Especie endémica de Costa Rica redescubierta en San Lorenzo de Tarrazú en 2021 y validada mediante evidencia integrativa genética, morfológica y bioacústica.",
       "sympatricSpecies": [
-        {
-          "scientificName": "Craugastor podiciferus",
-          "commonName": "Ranita de hojarasca de Talamanca",
-          "count": 3
-        },
-        {
-          "scientificName": "Pristimantis cruentus",
-          "commonName": "Ranita chirriadora de montaña",
-          "count": 2
-        },
-        {
-          "scientificName": "Isthmohyla rivularis",
-          "commonName": "Rana de torrente de Talamanca",
-          "count": 1
-        }
+        { "scientificName": "Craugastor podiciferus", "commonName": "Ranita de hojarasca de Talamanca", "count": 3 },
+        { "scientificName": "Pristimantis cruentus", "commonName": "Ranita chirriadora de montaña", "count": 2 },
+        { "scientificName": "Isthmohyla rivularis", "commonName": "Rana de torrente de Talamanca", "count": 1 }
       ]
     },
     "additionalPhotos": [
@@ -108,18 +96,6 @@
     ],
     "sightings": [
       {
-        "id": "sight-test-laptop-1",
-        "timestamp": "13 Oct 2026, 17:35 CST",
-        "date": "2026-10-13",
-        "observer": "Ing. Carvajal V.",
-        "locality": "Sector Las Nacientes, Tarrazú",
-        "coordinates": "9°39'45.0\" N, 84°01'20.0\" W",
-        "count": 3,
-        "individualsCount": 3,
-        "microhabitat": "Vegetación riparia",
-        "behaviorObserved": "Canto activo"
-      },
-      {
         "id": "sight-dota-20261009",
         "timestamp": "09 Oct 2026, 20:15 CST (Viernes)",
         "date": "2026-10-09",
@@ -140,6 +116,24 @@
         "curiousFindingTitle": "Macho cantor al que le falta un ojo (Anoftalmia)",
         "curiousFindingDescription": "Hallazgo sumamente curioso: se encontró un macho adulto activo al que le faltaba completamente un ojo (cicatrización natural). A pesar de la pérdida ocular, era el macho que cantaba con mayor potencia y volumen de todo el coro ribereño. Estaba posado sobre ramas caídas a 45 cm del caudal y a 45 m de la entrada del sitio.",
         "curiousFindingPhoto": "/hallazgo_macho_un_ojo.jpg"
+      },
+      {
+        "id": "sight-cascadas-vinotinto-20260828",
+        "timestamp": "28 Ago 2026, 19:40 CST",
+        "date": "2026-08-28",
+        "observer": "Ing. Carvajal V.",
+        "locality": "Cascadas vino tinto, Zona de los Santos",
+        "coordinates": "9°39'25.0\" N, 84°00'50.0\" W",
+        "count": 34,
+        "individualsCount": 34,
+        "microhabitat": "Vegetación riparia húmeda y rocas musgosas adyacentes a las cascadas vino tinto con spray constante.",
+        "weather": "Noche húmeda de montaña en zona de cascada, 17.2°C, HR 98%",
+        "temperatureC": 17.2,
+        "behaviorObserved": "Observación de 34 individuos activos cantando fuertemente en el curso y spray de las cascadas vino tinto.",
+        "notes": "Población excepcionalmente numerosa y activa registrada en Cascadas vino tinto. Registro científico de alta concentración de individuos en microhábitat de cascada.",
+        "vitalityStatus": "VIVO",
+        "lifeStage": "ADULTO",
+        "sex": "NO_APLICA"
       },
       {
         "id": "sight-2",

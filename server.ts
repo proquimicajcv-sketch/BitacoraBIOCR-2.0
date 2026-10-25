@@ -227,7 +227,7 @@ function mergeSpecimens(existingList: any[], incomingList: any[]): any[] {
 
 app.post('/api/database/specimens', (req: Request, res: Response): void => {
   try {
-    const { specimens, lastModified, deviceId } = req.body;
+    const { specimens, lastModified, deviceId, replace } = req.body;
     if (!Array.isArray(specimens)) {
       res.status(400).json({ success: false, error: 'Formato inválido' });
       return;
@@ -235,9 +235,8 @@ app.post('/api/database/specimens', (req: Request, res: Response): void => {
     const updatedTime = Number(lastModified) || Date.now();
     serverDbLastModified = updatedTime;
 
-    // Smart-merge with existing DB so sightings from ANY device are never lost
     let finalSpecimens = specimens;
-    if (fs.existsSync(DB_FILE)) {
+    if (!replace && fs.existsSync(DB_FILE)) {
       try {
         const content = fs.readFileSync(DB_FILE, 'utf-8');
         const currentData = JSON.parse(content);
@@ -249,11 +248,22 @@ app.post('/api/database/specimens', (req: Request, res: Response): void => {
       }
     }
 
-    // CRITICAL: Always write merged database to DB_FILE so all devices stay updated
+    // Write database to DB_FILE
     fs.writeFileSync(DB_FILE, JSON.stringify(finalSpecimens, null, 2), 'utf-8');
 
-    // Also write device backup if specified
-    if (deviceId) {
+    // Also write device backup if specified, or sync all if replace
+    if (replace) {
+      try {
+        if (fs.existsSync(DEVICES_DIR)) {
+          const devFiles = fs.readdirSync(DEVICES_DIR);
+          for (const f of devFiles) {
+            if (f.endsWith('.json')) {
+              fs.writeFileSync(path.join(DEVICES_DIR, f), JSON.stringify(finalSpecimens, null, 2), 'utf-8');
+            }
+          }
+        }
+      } catch {}
+    } else if (deviceId) {
       const targetFile = getTargetDbFile(deviceId);
       try {
         fs.writeFileSync(targetFile, JSON.stringify(finalSpecimens, null, 2), 'utf-8');
@@ -297,10 +307,12 @@ app.post('/api/database/import-json', (req: Request, res: Response): void => {
   try {
     const payload = req.body;
     let recordsToImport: any[] | null = null;
+    let shouldMerge = false;
     if (Array.isArray(payload)) {
       recordsToImport = payload;
     } else if (payload && Array.isArray(payload.specimens)) {
       recordsToImport = payload.specimens;
+      shouldMerge = Boolean(payload.merge);
     }
 
     if (!recordsToImport || recordsToImport.length === 0) {
@@ -309,7 +321,7 @@ app.post('/api/database/import-json', (req: Request, res: Response): void => {
     }
 
     let finalImport = recordsToImport;
-    if (fs.existsSync(DB_FILE)) {
+    if (shouldMerge && fs.existsSync(DB_FILE)) {
       try {
         const content = fs.readFileSync(DB_FILE, 'utf-8');
         const currentData = JSON.parse(content);
@@ -321,6 +333,18 @@ app.post('/api/database/import-json', (req: Request, res: Response): void => {
 
     fs.writeFileSync(DB_FILE, JSON.stringify(finalImport, null, 2), 'utf-8');
     serverDbLastModified = Date.now();
+
+    // Synchronize all device profiles with the imported database
+    try {
+      if (fs.existsSync(DEVICES_DIR)) {
+        const devFiles = fs.readdirSync(DEVICES_DIR);
+        for (const f of devFiles) {
+          if (f.endsWith('.json')) {
+            fs.writeFileSync(path.join(DEVICES_DIR, f), JSON.stringify(finalImport, null, 2), 'utf-8');
+          }
+        }
+      }
+    } catch {}
 
     res.json({
       success: true,

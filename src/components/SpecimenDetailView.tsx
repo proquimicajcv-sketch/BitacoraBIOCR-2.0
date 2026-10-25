@@ -2209,23 +2209,51 @@ export const SpecimenDetailView: React.FC<SpecimenDetailViewProps> = ({
                       <label className="block text-[10px] font-bold text-[#92400e] uppercase mb-1">
                         Adjuntar Fotografía del Hallazgo
                       </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            try {
-                              const isMacho = sightingCuriousTitle.toLowerCase().includes('macho') || sightingCuriousDesc.toLowerCase().includes('macho') || sightingCuriousTitle.toLowerCase().includes('ojo');
-                              const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'sighting_curious');
-                              setSightingCuriousPhoto(permanentUrl);
-                            } catch (err) {
-                              console.error('Error al guardar foto del hallazgo:', err);
-                            }
-                          }
-                        }}
-                        className="w-full text-xs text-[#92400e] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#92400e] file:text-white file:cursor-pointer cursor-pointer"
-                      />
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label className="px-3 py-1.5 rounded-lg bg-[#92400e] hover:bg-[#78350f] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                          <span className="material-symbols-outlined text-[16px]">photo_library</span>
+                          <span>Elegir de Fotos / Galería</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                try {
+                                  const isMacho = sightingCuriousTitle.toLowerCase().includes('macho') || sightingCuriousDesc.toLowerCase().includes('macho') || sightingCuriousTitle.toLowerCase().includes('ojo');
+                                  const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'sighting_curious');
+                                  setSightingCuriousPhoto(permanentUrl);
+                                } catch (err) {
+                                  console.error('Error al guardar foto del hallazgo:', err);
+                                }
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                        <label className="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-[#92400e] text-xs font-bold flex items-center gap-1.5 border border-amber-300 cursor-pointer shadow-xs active:scale-95">
+                          <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+                          <span>Tomar con Cámara</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                try {
+                                  const isMacho = sightingCuriousTitle.toLowerCase().includes('macho') || sightingCuriousDesc.toLowerCase().includes('macho') || sightingCuriousTitle.toLowerCase().includes('ojo');
+                                  const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'sighting_curious');
+                                  setSightingCuriousPhoto(permanentUrl);
+                                } catch (err) {
+                                  console.error('Error al guardar foto del hallazgo:', err);
+                                }
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
                       {sightingCuriousPhoto && (
                         <div className="mt-2 w-16 h-16 rounded-lg overflow-hidden border border-[#fde68a]">
                           <img src={sightingCuriousPhoto} alt="Previa" className="w-full h-full object-cover" />
@@ -2426,23 +2454,51 @@ export const SpecimenDetailView: React.FC<SpecimenDetailViewProps> = ({
               <label className="block text-[11px] font-bold text-[#002217] uppercase mb-1">
                 Subir nueva imagen desde este dispositivo
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    try {
-                      const isMacho = editingPhoto?.id === 'photo-4' || editingPhoto?.sightingId || editingPhoto?.label?.toLowerCase().includes('macho tuerto');
-                      const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'gallery_edit');
-                      setEditPhotoUrl(permanentUrl);
-                    } catch (err) {
-                      console.error('Error saving image:', err);
-                    }
-                  }
-                }}
-                className="w-full text-xs text-[#414844] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#002217] file:text-[#6cf8bb] file:cursor-pointer hover:file:bg-[#003d2b] cursor-pointer"
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="px-3.5 py-2 rounded-xl bg-[#002217] hover:bg-[#003d2b] text-[#6cf8bb] text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                  <span className="material-symbols-outlined text-[17px]">photo_library</span>
+                  <span>Elegir de Fotos / Galería</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          const isMacho = editingPhoto?.id === 'photo-4' || editingPhoto?.sightingId || editingPhoto?.label?.toLowerCase().includes('macho tuerto');
+                          const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'gallery_edit');
+                          setEditPhotoUrl(permanentUrl);
+                        } catch (err) {
+                          console.error('Error saving image:', err);
+                        }
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+                <label className="px-3 py-2 rounded-xl bg-[#f2f4ee] hover:bg-[#e7e9e3] text-[#002217] text-xs font-bold flex items-center gap-1.5 border border-[#c1c8c3] cursor-pointer shadow-xs active:scale-95">
+                  <span className="material-symbols-outlined text-[17px]">photo_camera</span>
+                  <span>Tomar con Cámara</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          const isMacho = editingPhoto?.id === 'photo-4' || editingPhoto?.sightingId || editingPhoto?.label?.toLowerCase().includes('macho tuerto');
+                          const permanentUrl = await saveImageOfflineAndServer(file, isMacho ? 'macho_tuerto' : 'gallery_edit');
+                          setEditPhotoUrl(permanentUrl);
+                        } catch (err) {
+                          console.error('Error saving image:', err);
+                        }
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Opción Enlace URL */}

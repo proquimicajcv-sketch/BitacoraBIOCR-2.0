@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#041f14"/>
+      <stop offset="50%" stop-color="#0a3523"/>
+      <stop offset="100%" stop-color="#02140d"/>
+    </linearGradient>
+    <radialGradient id="leafGlow" cx="45%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#1b5e39"/>
+      <stop offset="70%" stop-color="#0e3a22"/>
+      <stop offset="100%" stop-color="#072214"/>
+    </radialGradient>
+    <linearGradient id="bodyRed" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#ff3b30"/>
+      <stop offset="40%" stop-color="#e61c24"/>
+      <stop offset="85%" stop-color="#b80c18"/>
+      <stop offset="100%" stop-color="#80040e"/>
+    </linearGradient>
+    <radialGradient id="skinGlow" cx="35%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ff7b60" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#e61c24" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="legBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="40%" stop-color="#172554"/>
+      <stop offset="80%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <radialGradient id="eyeGrad" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="40%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="15" stdDeviation="15" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Rainforest Background -->
+  <rect width="800" height="600" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Bokeh Circles in Rainforest Background -->
+  <circle cx="150" cy="120" r="80" fill="#15803d" opacity="0.15"/>
+  <circle cx="680" cy="180" r="110" fill="#22c55e" opacity="0.1"/>
+  <circle cx="280" cy="480" r="140" fill="#166534" opacity="0.2"/>
+
+  <!-- Giant Tropical Rainforest Leaf with veins -->
+  <g filter="url(#shadow)">
+    <path d="M 50 550 Q 250 250 750 350 Q 650 580 200 580 Z" fill="url(#leafGlow)"/>
+    <!-- Leaf Primary Vein -->
+    <path d="M 50 550 Q 380 380 750 350" stroke="#22c55e" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.4"/>
+    <!-- Secondary Veins -->
+    <path d="M 220 460 Q 300 390 380 360" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.3"/>
+    <path d="M 340 430 Q 420 370 510 350" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.3"/>
+    <path d="M 460 410 Q 530 365 620 355" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.3"/>
+    <!-- Rain droplets on leaf -->
+    <ellipse cx="280" cy="460" rx="14" ry="9" fill="#ffffff" opacity="0.35"/>
+    <ellipse cx="610" cy="380" rx="10" ry="7" fill="#ffffff" opacity="0.3"/>
+  </g>
+
+  <!-- Oophaga pumilio (Strawberry Poison Dart Frog - Blue Jeans Morph) -->
+  <g filter="url(#shadow)" transform="translate(40, -10)">
+    <!-- Back Left Leg (Blue Jeans) -->
+    <path d="M 330 380 C 270 360 210 400 190 450 C 180 475 200 490 230 475 C 260 460 280 420 340 410 Z" fill="url(#legBlue)"/>
+    <circle cx="195" cy="465" r="7" fill="#1e3a8a"/>
+    <circle cx="205" cy="480" r="7" fill="#1e3a8a"/>
+
+    <!-- Back Right Leg (Blue Jeans) -->
+    <path d="M 430 390 C 500 370 550 410 570 470 C 580 495 550 510 525 490 C 495 465 475 425 420 420 Z" fill="url(#legBlue)"/>
+    <circle cx="560" cy="485" r="7" fill="#1e3a8a"/>
+    <circle cx="545" cy="502" r="7" fill="#1e3a8a"/>
+
+    <!-- Front Left Arm (Blue Jeans) -->
+    <path d="M 320 330 C 270 330 240 370 230 420 C 225 440 245 445 255 435 C 270 415 285 375 330 360 Z" fill="url(#legBlue)"/>
+    <circle cx="235" cy="435" r="6" fill="#1e3a8a"/>
+    <circle cx="248" cy="442" r="6" fill="#1e3a8a"/>
+
+    <!-- Front Right Arm (Blue Jeans) -->
+    <path d="M 460 320 C 510 320 530 355 535 410 C 538 430 520 440 510 425 C 495 405 485 365 445 350 Z" fill="url(#legBlue)"/>
+    <circle cx="530" cy="425" r="6" fill="#1e3a8a"/>
+    <circle cx="518" cy="435" r="6" fill="#1e3a8a"/>
+
+    <!-- Vivid Strawberry Red Body -->
+    <ellipse cx="385" cy="340" rx="95" ry="75" transform="rotate(-5, 385, 340)" fill="url(#bodyRed)"/>
+    <ellipse cx="370" cy="325" rx="75" ry="55" transform="rotate(-5, 370, 325)" fill="url(#skinGlow)"/>
+
+    <!-- Micro granular bumps on poisonous skin -->
+    <circle cx="340" cy="320" r="3" fill="#ff7b60" opacity="0.6"/>
+    <circle cx="360" cy="305" r="2.5" fill="#ff7b60" opacity="0.7"/>
+    <circle cx="390" cy="315" r="3.5" fill="#ff7b60" opacity="0.6"/>
+    <circle cx="415" cy="330" r="3" fill="#ff7b60" opacity="0.6"/>
+    <circle cx="375" cy="350" r="3" fill="#ff7b60" opacity="0.5"/>
+
+    <!-- Head & Snout -->
+    <path d="M 330 310 C 330 250 440 250 445 310 C 445 340 330 340 330 310 Z" fill="url(#bodyRed)"/>
+    
+    <!-- Large Protruding Black Eyes -->
+    <!-- Left Eye -->
+    <ellipse cx="335" cy="275" rx="19" ry="17" fill="url(#eyeGrad)"/>
+    <circle cx="330" cy="270" r="5" fill="#ffffff" opacity="0.9"/>
+    <!-- Right Eye -->
+    <ellipse cx="435" cy="272" rx="19" ry="17" fill="url(#eyeGrad)"/>
+    <circle cx="430" cy="267" r="5" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- Scientific Badge Banner -->
+  <g transform="translate(30, 35)">
+    <rect width="360" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#6cf8bb" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">AMPHIBIA • DENDROBATIDAE</text>
+    <text x="20" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" font-style="italic">Oophaga pumilio</text>
+  </g>
+  <g transform="translate(560, 35)">
+    <rect width="210" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="18" y="28" fill="#fca5a5" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" letter-spacing="1">SARAPIQUÍ, COSTA RICA</text>
+    <text x="18" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700">Rana Dardo Roja</text>
+  </g>
+</svg>

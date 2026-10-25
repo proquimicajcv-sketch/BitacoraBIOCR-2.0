@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="orchidGarden" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#02140d"/>
+      <stop offset="50%" stop-color="#0b2e1e"/>
+      <stop offset="100%" stop-color="#04170f"/>
+    </linearGradient>
+    <radialGradient id="purplePetal" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#e879f9"/>
+      <stop offset="35%" stop-color="#c026d3"/>
+      <stop offset="75%" stop-color="#9333ea"/>
+      <stop offset="100%" stop-color="#6b21a8"/>
+    </radialGradient>
+    <radialGradient id="lipYellow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="45%" stop-color="#facc15"/>
+      <stop offset="85%" stop-color="#c026d3"/>
+    </radialGradient>
+    <linearGradient id="stemGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="50%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+    <filter id="orchidGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#orchidGarden)"/>
+
+  <!-- Tree Trunk (Poró / Roble Sabana Host Tree) -->
+  <path d="M 120 0 Q 150 300 130 600 L 220 600 Q 240 300 210 0 Z" fill="#2d2013"/>
+  <path d="M 130 50 Q 170 320 145 550" stroke="#16a34a" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.4"/>
+
+  <!-- Epiphyte Pseudobulbs and Leaves -->
+  <g transform="translate(180, 220)">
+    <ellipse cx="20" cy="80" rx="14" ry="70" transform="rotate(15, 20, 80)" fill="url(#stemGreen)"/>
+    <ellipse cx="50" cy="90" rx="12" ry="60" transform="rotate(-10, 50, 90)" fill="url(#stemGreen)"/>
+    <!-- Thick Coriaceous Leaves -->
+    <path d="M 30 20 C 10 -40 70 -90 120 -80 C 100 -30 60 0 30 20 Z" fill="url(#stemGreen)"/>
+    <path d="M 50 40 C 70 -20 140 -60 180 -40 C 150 10 90 20 50 40 Z" fill="url(#stemGreen)"/>
+  </g>
+
+  <!-- Guarianthe skinneri (Guaria Morada - Flor Nacional de Costa Rica) -->
+  <g filter="url(#orchidGlow)" transform="translate(420, 310)">
+    <!-- Dorsal Sepal -->
+    <path d="M 0,-30 C -25,-120 25,-120 0,-30 Z" fill="url(#purplePetal)"/>
+    
+    <!-- Lateral Sepals -->
+    <path d="M -15,10 C -70,90 -10,120 0,20 Z" fill="url(#purplePetal)"/>
+    <path d="M 15,10 C 70,90 10,120 0,20 Z" fill="url(#purplePetal)"/>
+
+    <!-- Broad Wavy Petals -->
+    <path d="M -20,-10 C -120,-80 -140,20 -30,0 Z" fill="url(#purplePetal)"/>
+    <path d="M 20,-10 C 120,-80 140,20 30,0 Z" fill="url(#purplePetal)"/>
+
+    <!-- Central Tubular Lip / Labelo with Yellow-White Throat -->
+    <ellipse cx="0" cy="30" rx="42" ry="48" fill="url(#purplePetal)"/>
+    <ellipse cx="0" cy="22" rx="22" ry="26" fill="url(#lipYellow)"/>
+    <ellipse cx="0" cy="18" rx="10" ry="12" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Column / Reproductive Structure -->
+    <path d="M -5,-5 L 5,-5 L 3,12 L -3,12 Z" fill="#fdf4ff"/>
+  </g>
+
+  <!-- Second Smaller Guaria Bloom in Inflorescence -->
+  <g filter="url(#orchidGlow)" transform="translate(560, 200) scale(0.65)">
+    <path d="M 0,-30 C -25,-120 25,-120 0,-30 Z" fill="url(#purplePetal)"/>
+    <path d="M -15,10 C -70,90 -10,120 0,20 Z" fill="url(#purplePetal)"/>
+    <path d="M 15,10 C 70,90 10,120 0,20 Z" fill="url(#purplePetal)"/>
+    <path d="M -20,-10 C -120,-80 -140,20 -30,0 Z" fill="url(#purplePetal)"/>
+    <path d="M 20,-10 C 120,-80 140,20 30,0 Z" fill="url(#purplePetal)"/>
+    <ellipse cx="0" cy="30" rx="42" ry="48" fill="url(#purplePetal)"/>
+    <ellipse cx="0" cy="22" rx="22" ry="26" fill="url(#lipYellow)"/>
+    <ellipse cx="0" cy="18" rx="10" ry="12" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- Scientific Badge Banner -->
+  <g transform="translate(30, 35)">
+    <rect width="380" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#c026d3" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#f0abfc" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">PLANTAE • ORCHIDACEAE</text>
+    <text x="20" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" font-style="italic">Guarianthe skinneri</text>
+  </g>
+  <g transform="translate(520, 35)">
+    <rect width="250" height="65" rx="14" fill="#02140d" fill-opacity="0.85" stroke="#9333ea" stroke-width="1.5"/>
+    <text x="18" y="28" fill="#e9d5ff" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" letter-spacing="1">VALLE CENTRAL • FLOR NACIONAL</text>
+    <text x="18" y="50" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700">Guaria Morada de Costa Rica</text>
+  </g>
+</svg>

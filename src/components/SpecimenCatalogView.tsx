@@ -343,7 +343,7 @@ export const SpecimenCatalogView: React.FC<SpecimenCatalogViewProps> = ({
                     src={specimen.heroImage || '/isthmohyla_nacientes.jpg'}
                     alt={specimen.scientificName}
                     onError={(e) => {
-                      handleImageOfflineFallback(e.currentTarget as HTMLImageElement, '/isthmohyla_nacientes.jpg');
+                      handleImageOfflineFallback(e.currentTarget as HTMLImageElement, specimen.heroImage || '/isthmohyla_nacientes.jpg');
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

@@ -676,11 +676,30 @@ export const NewSpecimenModal: React.FC<NewSpecimenModalProps> = ({
               </div>
 
               <div className="flex flex-col gap-2.5 flex-1 w-full justify-between">
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2">
-                    <label className="px-3 py-2 rounded-lg bg-[#002217] hover:bg-[#0f382a] text-[#6cf8bb] text-xs font-bold flex items-center gap-1.5 border border-[#6cf8bb]/40 cursor-pointer transition-colors shadow-xs">
-                      <span className="material-symbols-outlined text-[18px]">upload_file</span>
-                      <span>Subir Fotografía del Dispositivo</span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Opción 1: Abrir "Fotos", "Imágenes" o Fototeca del dispositivo (SIN capture) */}
+                    <label
+                      className="px-3.5 py-2 rounded-lg bg-[#002217] hover:bg-[#0f382a] text-[#6cf8bb] text-xs font-bold flex items-center gap-1.5 border border-[#6cf8bb]/50 cursor-pointer transition-all shadow-xs active:scale-95"
+                      title="Abrir galería de Fotos del celular o iPad"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">photo_library</span>
+                      <span>Elegir de Fotos / Galería</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* Opción 2: Tomar fotografía in situ con la cámara del dispositivo */}
+                    <label
+                      className="px-3 py-2 rounded-lg bg-[#f0fdf4] hover:bg-[#dcfce7] text-[#006c49] text-xs font-bold flex items-center gap-1.5 border border-[#86efac] cursor-pointer transition-all shadow-xs active:scale-95"
+                      title="Abrir cámara del dispositivo para capturar foto en vivo en el campo"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                      <span>Tomar con Cámara (In Situ)</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -689,19 +708,21 @@ export const NewSpecimenModal: React.FC<NewSpecimenModalProps> = ({
                         className="hidden"
                       />
                     </label>
-                    <span className="text-xs text-[#717974]">o ingresar enlace web:</span>
                   </div>
 
-                  <input
-                    type="url"
-                    value={heroImage}
-                    onChange={(e) => {
-                      setHeroImage(e.target.value);
-                      setUploadedBase64(null);
-                    }}
-                    placeholder="https://ejemplo.com/fotografia.jpg"
-                    className="w-full px-3 py-2 rounded-lg bg-white border border-[#c1c8c3] text-xs font-mono text-[#191c19] focus:outline-none focus:ring-2 focus:ring-[#006c49]"
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-[#717974] whitespace-nowrap">o ingresar enlace web:</span>
+                    <input
+                      type="url"
+                      value={heroImage}
+                      onChange={(e) => {
+                        setHeroImage(e.target.value);
+                        setUploadedBase64(null);
+                      }}
+                      placeholder="https://ejemplo.com/fotografia.jpg"
+                      className="w-full px-3 py-1.5 rounded-lg bg-white border border-[#c1c8c3] text-xs font-mono text-[#191c19] focus:outline-none focus:ring-2 focus:ring-[#006c49]"
+                    />
+                  </div>
                 </div>
 
                 {/* Fotografías de muestra en Costa Rica */}
